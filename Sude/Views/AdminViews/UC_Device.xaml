@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="Sude.Views.AdminViews.UC_Device"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Sude.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000" Background="#F8E8EE">
+
+    <UserControl.Resources>
+        <Style x:Key="CenterVerticalStyle" TargetType="FrameworkElement">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="DataGridTextColumnStyle" TargetType="TextBlock" BasedOn="{StaticResource CenterVerticalStyle}">
+            <Setter Property="Margin" Value="10,0"/>
+        </Style>
+
+        <Style x:Key="ActionStackPanelStyle" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="ImportantDevices" Width="35" Height="35" Foreground="#BB2248" VerticalAlignment="Center"/>
+                <TextBlock Text="Cihaz Yönetimi" FontSize="24" FontWeight="Bold" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="#BB2248"/>
+            </StackPanel>
+            <Button HorizontalAlignment="Right"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Background="#BB2248" BorderBrush="#BB2248"
+                    materialDesign:ButtonAssist.CornerRadius="8"
+                    Height="45"
+                    Command="{Binding AddDeviceCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlusThick" Width="20" Height="20" VerticalAlignment="Center"/>
+                    <TextBlock Text="Yeni Cihaz Ekle" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </DockPanel>
+
+        <materialDesign:Card Grid.Row="1" Background="#F8E8EE" UniformCornerRadius="12" Margin="5">
+            <materialDesign:Card.Effect>
+                <DropShadowEffect Color="#BB2248"
+                           BlurRadius="15"
+                           ShadowDepth="2"
+                           Opacity="0.3"
+                           Direction="270"/>
+            </materialDesign:Card.Effect>
+
+            <DataGrid ItemsSource="{Binding Devices}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      SelectionMode="Single"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#757F8A"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      FontSize="12"
+                      RowHeight="45">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="   #" Binding="{Binding Id}" Width="Auto" IsReadOnly="True"
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}"/>
+                    <DataGridTextColumn Header="   Cihaz Adı" Binding="{Binding DeviceType}" Width="*" IsReadOnly="True"
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}"/>
+                    <DataGridTemplateColumn Header="         İşlemler" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Style="{StaticResource ActionStackPanelStyle}">
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Width="25" Height="25"
+                                            Command="{Binding DataContext.EditDeviceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                        <materialDesign:PackIcon Kind="Pencil" Foreground="#BB2248" Width="20" Height="20"/>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

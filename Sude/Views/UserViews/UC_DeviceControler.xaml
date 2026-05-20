@@ -1,0 +1,118 @@
+﻿<UserControl x:Class="Sude.Views.UserViews.UC_DeviceControler"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="#F8E8EE">
+    <Grid Margin="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="20,0,20,20">
+            <Button Command="{Binding GoBackCommand}" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                    Background="White" BorderThickness="0" HorizontalAlignment="Left" ToolTip="Cihaz Seçimine Dön">
+                <materialDesign:PackIcon Kind="ArrowLeft" Foreground="#BB2248" Width="25" Height="25"/>
+            </Button>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{Binding CurrentDevice.DeviceType}" FontSize="28" FontWeight="Bold" Foreground="#3A0519" HorizontalAlignment="Center"/>
+                <TextBlock Text="Cihaz Kontrol ve Test Ekranı" FontSize="14" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <Button Command="{Binding LogoutCommand}" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                    Background="White" BorderThickness="0" HorizontalAlignment="Right" ToolTip="Sistemden Çıkış Yap">
+                <materialDesign:PackIcon Kind="Logout" Foreground="#BB2248" Width="25" Height="25"/>
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="1" Background="White" CornerRadius="15" Margin="20" Padding="20">
+            <Border.Effect>
+                <DropShadowEffect Color="#BB2248" BlurRadius="20" ShadowDepth="3" Opacity="0.15"/>
+            </Border.Effect>
+
+            <Grid>
+                <TextBlock Text="Görsel Yüklenmemiş" Foreground="LightGray" FontSize="20" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DisplayImage}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <Image Source="{Binding DisplayImage}" Stretch="Uniform" Margin="10"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="White" CornerRadius="15" Margin="20" Padding="20">
+            <Border.Effect>
+                <DropShadowEffect Color="#BB2248" BlurRadius="20" ShadowDepth="3" Opacity="0.15"/>
+            </Border.Effect>
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="{Binding InstructionText}" 
+                           FontSize="22" FontWeight="Bold" Foreground="#3A0519" TextWrapping="Wrap" Margin="0,0,0,10" TextAlignment="Center"/>
+
+                <TextBlock Text="Not: Cihazınızın bağlı ve çalışır durumda olduğundan emin olun." 
+                           FontSize="14" Foreground="Gray" TextWrapping="Wrap" TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <Button Grid.Row="3" Content="KONTROL ET" Command="{Binding TestDeviceCommand}"
+                IsEnabled="{Binding IsEittReady}" 
+                Background="#BB2248" BorderBrush="#BB2248" Foreground="White" 
+                Height="80" FontSize="26" FontWeight="Bold" Cursor="Hand" Margin="50,10,50,20"
+                materialDesign:ButtonAssist.CornerRadius="15">
+            <Button.Effect>
+                <DropShadowEffect Color="#BB2248" BlurRadius="15" ShadowDepth="5" Opacity="0.4"/>
+            </Button.Effect>
+        </Button>
+        <!-- ================================================================= -->
+        <!-- ONBOARDING VİDEO KATMANI (Overlay) -->
+        <!-- ================================================================= -->
+        <Grid Panel.ZIndex="99" Margin="-50" Grid.RowSpan="4">
+            <!-- Margin -50 ile arka planı tamamen kaplamasını sağlıyoruz -->
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <!-- IsVideoOverlayVisible True ise bu katmanı göster -->
+                        <DataTrigger Binding="{Binding IsVideoOverlayVisible}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <!-- Yarı saydam siyah arka plan (Sinema efekti) -->
+            <Border Background="Black" Opacity="0.85"/>
+
+            <!-- Video Alanı -->
+            <Border Background="Black" BorderBrush="#BB2248" BorderThickness="2" 
+                    CornerRadius="15" Margin="100,50,100,50" ClipToBounds="True">
+                <Grid>
+                    <!-- WPF'in kendi Video Oynatıcısı -->
+                    <MediaElement Source="{Binding DeviceVideoPath}" 
+                                  LoadedBehavior="Play" UnloadedBehavior="Stop" 
+                                  Stretch="Uniform"/>
+
+                    <!-- SAĞ ÜST KÖŞEDEKİ "X" (KAPAT) BUTONU -->
+                    <Button Command="{Binding CloseVideoCommand}" 
+                            Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                            Background="#BB2248" BorderThickness="0" 
+                            HorizontalAlignment="Right" VerticalAlignment="Top" 
+                            Margin="15" Width="40" Height="40" ToolTip="Videoyu Kapat ve Teste Başla">
+                        <materialDesign:PackIcon Kind="Close" Foreground="White" Width="25" Height="25"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

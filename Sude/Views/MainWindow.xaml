@@ -1,0 +1,37 @@
+﻿<Window x:Class="Sude.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        xmlns:vmodels="clr-namespace:Sude.ViewModels"
+        xmlns:adminViewModels="clr-namespace:Sude.ViewModels.AdminViewModels"
+        xmlns:userViewModels="clr-namespace:Sude.ViewModels.UserViewModels"
+        
+        xmlns:views="clr-namespace:Sude.Views"
+        xmlns:adminViews="clr-namespace:Sude.Views.AdminViews"
+        xmlns:userViews="clr-namespace:Sude.Views.UserViews"
+        
+        WindowStartupLocation="CenterScreen"
+        Title="KNX Automation" Height="700" Width="1200" Background="#3A0519" WindowState="Maximized">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vmodels:LoginViewModel}">
+            <views:UC_Login/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type adminViewModels:AdminPanelViewModel}">
+            <adminViews:UC_AdminPanel/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type userViewModels:DeviceSelectionViewModel}">
+            <userViews:UC_DeviceSelectionView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type userViewModels:DeviceControlerViewModel}">
+            <userViews:UC_DeviceControler/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <ContentControl Content="{Binding CurrentView}"/>
+    </Grid>
+</Window>

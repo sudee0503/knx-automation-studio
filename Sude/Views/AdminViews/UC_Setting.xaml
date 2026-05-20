@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="Sude.Views.AdminViews.UC_Setting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" Background="#F8E8EE">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="156*"/>
+            <RowDefinition Height="305*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Settings" Width="35" Height="35" Foreground="#BB2248" VerticalAlignment="Center"/>
+                <TextBlock Text="Sistem Ayarları" FontSize="24" FontWeight="Bold" Margin="15,0,0,0" VerticalAlignment="Center" Foreground="#BB2248"/>
+            </StackPanel>
+        </DockPanel>
+
+        <materialDesign:Card Grid.Row="1" Background="#F8E8EE" UniformCornerRadius="12" Margin="5,5,5,5" Padding="40" Grid.RowSpan="2">
+            <materialDesign:Card.Effect>
+                <DropShadowEffect Color="#BB2248" BlurRadius="15" ShadowDepth="2" Opacity="0.1"/>
+            </materialDesign:Card.Effect>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" HorizontalAlignment="Left" Width="400">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <materialDesign:PackIcon Kind="ShieldAccount" Width="25" Height="25" Foreground="#BB2248" VerticalAlignment="Center"/>
+                        <TextBlock Text="Yönetici Bilgilerini Güncelle" FontSize="18" FontWeight="Bold" Foreground="#BB2248" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Hesabınızın güvenliği için giriş bilgilerinizi bu alandan değiştirebilirsiniz." FontSize="13" Foreground="Gray" Margin="0,0,0,30" TextWrapping="Wrap"/>
+
+                    <TextBox materialDesign:HintAssist.Hint="Yeni Yönetici Kullanıcı Adı" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="15" Margin="0,0,0,25" Text="{Binding NewUsername, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox materialDesign:HintAssist.Hint="Yeni Şifre" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="15" Margin="0,0,0,25" Text="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox materialDesign:HintAssist.Hint="Yeni Şifre (Tekrar)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontSize="15" Margin="0,0,0,40" Text="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <Button Content="BİLGİLERİMİ GÜNCELLE" Command="{Binding UpdateAdminInfoCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#BB2248" BorderBrush="#BB2248" Height="45" FontWeight="Bold" Cursor="Hand" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" HorizontalAlignment="Left" Width="400">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <materialDesign:PackIcon Kind="DatabaseSettings" Width="25" Height="25" Foreground="#BB2248" VerticalAlignment="Center"/>
+                        <TextBlock Text="Veritabanı Bakımı" FontSize="18" FontWeight="Bold" Foreground="#BB2248" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Sistemin hızlı çalışması için 1 yıldan eski işlem kayıtlarını (Log) Excel formatında dışa aktarıp, veritabanından kalıcı olarak temizleyebilirsiniz." FontSize="13" Foreground="Gray" Margin="0,0,0,30" TextWrapping="Wrap" LineHeight="20"/>
+
+                    <Border Background="#FFF3CD" BorderBrush="#FFEEBA" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,40">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="InformationOutline" Foreground="#856404" Width="24" Height="24" VerticalAlignment="Center"/>
+                            <TextBlock Text="Bu işlem önce verileri Excel olarak masaüstünüze kaydeder, işlem sorunsuz biterse veritabanından siler." Foreground="#856404" FontSize="12" Margin="10,0,0,0" TextWrapping="Wrap" Width="310"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="ESKİ KAYITLARI ARŞİVLE VE SİL" Command="{Binding ArchiveAndCleanLogsCommand}" Style="{StaticResource MaterialDesignRaisedButton}" Background="#BB2248" BorderBrush="#BB2248" Height="45" FontWeight="Bold" ToolTip="1 Yıldan eski kayıtları Excel'e aktar ve veritabanını temizle">
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

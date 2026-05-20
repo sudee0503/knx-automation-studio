@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="Sude.Views.AdminViews.UC_AdminPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"   
+             xmlns:local="clr-namespace:Sude.Views.AdminViews"
+             xmlns:converters="clr-namespace:Sude.Converters" 
+             mc:Ignorable="d" Background = "#3A0519"
+             d:DesignHeight="700" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <converters:MenuEqualityConverter x:Key="MenuEqualityConverter"/>
+    </UserControl.Resources>
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width = "250"/>
+            <ColumnDefinition Width = "*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column = "1">
+            <Grid.RowDefinitions >
+                <RowDefinition Height = "80"/>
+                <RowDefinition Height = "*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="10,0,20,0">
+                <Button Command="{Binding LogoutCommand}" 
+                        Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
+                        Background="#3A0519" BorderBrush="#757F8A" BorderThickness="2" 
+                        HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Sistemden Çıkış Yap">
+                    <materialDesign:PackIcon Kind="Logout" Foreground="#757F8A" Width="25" Height="25"/>
+                </Button>
+            </Grid>
+
+            <ContentControl Content="{Binding CurrentView}" Grid.Row="1" Margin="5,5,10,10"/>
+        </Grid>
+
+        <StackPanel Grid.Column = "0" Margin = "10,10,5,10">
+            <StackPanel.Resources >
+                <Style x:Key="SidebarButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Height" Value="40" />
+                    <Setter Property="Margin" Value="0,5" />
+                    <Setter Property="Foreground" Value="#757F8A" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Style.Triggers>
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource MenuEqualityConverter}">
+                                    <Binding Path="DataContext.SelectedMenuItem" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}" />
+                                    <Binding Path="Tag" RelativeSource="{RelativeSource Self}" />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+
+                            <Setter Property="Foreground" Value="#BB2248" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="BorderThickness" Value="4,0,0,0" />
+                            <Setter Property="BorderBrush" Value="#BB2248" />
+                            <Setter Property="Background" Value="#10FFFFFF" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+
+            <DockPanel Margin = "10,20,10,30" >
+                <Image Source = "C:\Users\Hskar\Desktop\Graduation Projects\Mutlusan logo.png" Width = "150" Height = "30" />
+            </DockPanel>
+
+            <Button  
+            Style = "{StaticResource SidebarButtonStyle}" 
+                Command="{Binding OpenDashboardCommand}" 
+                Tag="Anasayfa">
+                <StackPanel Orientation = "Horizontal" >
+                    <materialDesign:PackIcon Kind = "ViewDashboard" Width="20" Height="20" Margin="0,0,10,0"/>
+                    <TextBlock Text="Anasayfa" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource SidebarButtonStyle}" 
+                Command="{Binding OpenUserCommand}" Cursor="Hand"
+                Tag="Kullanıcılar">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind = "Users" Width="20" Height = "20" Margin="0,0,10,0"/>
+                    <TextBlock Text="Kullanıcılar" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource SidebarButtonStyle}" 
+                Command="{Binding OpenLogCommand}"
+                Tag="İşlemler">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind = "Text" Width="20" Height="20" Margin="0,0,10,0" Cursor=""/>
+                    <TextBlock Text="İşlemler" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource SidebarButtonStyle}" 
+                Command="{Binding OpenDeviceCommand}"
+                Tag="Ürünler">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind = "Devices" Width="20" Height="20" Margin="0,0,10,0"/>
+                    <TextBlock Text="Ürünler" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Style="{StaticResource SidebarButtonStyle}" 
+                Command="{Binding OpenSettingCommand}"
+                Tag="Ayarlar">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind = "Settings" Width="20" Height="20" Margin="0,0,10,0"/>
+                    <TextBlock Text="Ayarlar" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
