@@ -1,0 +1,121 @@
+-- =======================================================
+-- KNX Automation Studio - Database Schema
+-- Target Database: Microsoft SQL Server
+-- Description: Creates all tables required for the 
+--              automation tool with relational constraints.
+-- =======================================================
+
+-- 1.
+CREATE TABLE Users (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(20) CHECK (Role IN ('Admin', 'User')) NOT NULL,
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+-- 2.
+CREATE TABLE Devices (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    DeviceType NVARCHAR(50),
+    ProjectFileData VARBINARY(MAX) NULL,
+    VideoFileData VARBINARY(MAX) NULL,
+    MainImageFileData VARBINARY(MAX) NULL,
+    ProjectFileName NVARCHAR(255) NULL,
+    VideoFileName NVARCHAR(255) NULL
+);
+
+-- 3.
+CREATE TABLE DeviceAssets (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    DeviceId INT NOT NULL,
+    StepOrder INT NOT NULL,
+    ContentType NVARCHAR(50) NOT NULL,
+    ContentText NVARCHAR(MAX) NULL,
+    ContentData VARBINARY(MAX) NULL
+);
+ 
+--4.
+CREATE TABLE Logs (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    UserId INT, 
+    HedefUserId INT NULL,
+    HedefDeviceId INT NULL, 
+    HedefSeriNo NVARCHAR(50) NULL,
+    Tarihi DATETIME DEFAULT GETDATE(),
+    TTypeId INT
+);
+
+-- 5.
+CREATE TABLE TransactionTypes (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    TType NVARCHAR(100) NOT NULL
+);
+
+--6.
+CREATE TABLE SerialNumbers (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    FirmCode BINARY(2) NOT NULL,
+    DeviceID INT NOT NULL,
+    YearCode TINYINT NOT NULL,
+    Counter SMALLINT NOT NULL DEFAULT 0,
+    RecordDate DATE NOT NULL DEFAULT GETDATE(),
+
+    -- Computed Column: 6 byte VARBINARY, direkt C# byte[] ile uyumlu
+    SerialNumber AS (
+        CAST(FirmCode AS BINARY(2)) +          -- 2 byte
+        CAST(DeviceID AS BINARY(1)) +          -- 1 byte
+        CAST(YearCode AS BINARY(1)) +          -- 1 byte
+        CAST(Counter AS BINARY(2))             -- 2 byte
+    ) PERSISTED,
+
+    IsAssigned BIT NOT NULL DEFAULT 0
+);
+
+-- 7. GenerateCounter Proseduru
+CREATE OR ALTER PROCEDURE [dbo].[GenerateCounter]
+    @FirmCode BINARY(2),
+    @DeviceID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @YearCode TINYINT = CAST(RIGHT(YEAR(GETDATE()), 2) AS TINYINT);
+    DECLARE @ReuseID INT;
+
+    SELECT TOP 1 @ReuseID = ID 
+    FROM SerialNumbers 
+    WHERE DeviceID = @DeviceID 
+      AND YearCode = @YearCode 
+      AND IsAssigned = 0;
+
+    IF @ReuseID IS NOT NULL
+    BEGIN
+        SELECT ID, SerialNumber 
+        FROM SerialNumbers 
+        WHERE ID = @ReuseID;
+    END
+    ELSE
+
+    BEGIN
+        DECLARE @NextCounter SMALLINT;
+        SELECT @NextCounter = ISNULL(MAX(Counter), 0) + 1
+        FROM SerialNumbers
+        WHERE DeviceID = @DeviceID AND YearCode = @YearCode;
+
+        INSERT INTO SerialNumbers (FirmCode, DeviceID, YearCode, Counter, IsAssigned)
+        VALUES (@FirmCode, @DeviceID, @YearCode, @NextCounter, 0); -- Ba ta 0 olarak ekliyoruz
+
+        SELECT ID, SerialNumber 
+        FROM SerialNumbers 
+        WHERE ID = SCOPE_IDENTITY();
+    END
+END
+
+-- 8. Relational Constraints
+ALTER TABLE Logs ADD CONSTRAINT FK_Logs_Users FOREIGN KEY (UserId) REFERENCES Users(Id);
+ALTER TABLE Logs ADD CONSTRAINT FK_Logs_HedefUsers FOREIGN KEY (HedefUserId) REFERENCES Users(Id);
+ALTER TABLE Logs ADD CONSTRAINT FK_Logs_HedefDevices FOREIGN KEY (HedefDeviceId) REFERENCES Devices(Id);
+ALTER TABLE Logs ADD CONSTRAINT FK_Logs_TransactionTypes FOREIGN KEY (TTypeId) REFERENCES TransactionTypes(Id);
+ALTER TABLE SerialNumbers ADD CONSTRAINT FK_SerialNumbers_Devices FOREIGN KEY (DeviceID) REFERENCES Devices(Id);
+
