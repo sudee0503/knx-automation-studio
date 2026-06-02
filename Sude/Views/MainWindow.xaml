@@ -10,7 +10,7 @@
         xmlns:adminViews="clr-namespace:Sude.Views.AdminViews"
         xmlns:userViews="clr-namespace:Sude.Views.UserViews"
         
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen" Icon="/Resources/MutlusanLogoM.png"
         Title="KNX Automation" Height="700" Width="1200" Background="#3A0519" WindowState="Maximized">
 
     <Window.Resources>
@@ -32,6 +32,10 @@
     </Window.Resources>
 
     <Grid>
-        <ContentControl Content="{Binding CurrentView}"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="393*"/>
+        </Grid.ColumnDefinitions>
+        <ContentControl Content="{Binding CurrentView}" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
