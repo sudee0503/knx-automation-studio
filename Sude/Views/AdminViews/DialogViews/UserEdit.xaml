@@ -5,21 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Sude.Views.AdminViews.DialogViews"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" 
-             d:DesignHeight="325" d:DesignWidth="400" Background="#F8E8EE">
+             mc:Ignorable="d" Background="#F8E8EE" Width="319" Height="310">
 
     <Grid Margin="25">
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Height="50">
-                <materialDesign:PackIcon Kind="AccountEdit" Width="30" Height="30" Margin="50,10,0,0" Foreground="#BB2248" HorizontalAlignment="Center"/>
+                <materialDesign:PackIcon Kind="AccountEdit" Width="30" Height="30" Margin="20,10,0,0" Foreground="#BB2248" HorizontalAlignment="Center"/>
                 <TextBlock Text="Kullanıcı Düzenle" FontSize="20" FontWeight="Bold" Foreground="#BB2248" HorizontalAlignment="Center" Margin="15,10,0,10"/>
             </StackPanel>
-
-            <TextBox materialDesign:HintAssist.Hint="Kullanıcı ID (Değiştirilemez)" 
-                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                     FontSize="15" Margin="50,0,50,2"
-                     Text="{Binding UserId}"
-                     IsReadOnly="True" Foreground="Gray" />
 
             <TextBox materialDesign:HintAssist.Hint="Kullanıcı Adı" 
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -33,10 +26,11 @@
                      Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
                      materialDesign:TextFieldAssist.HasClearButton="True" />
 
-            <Button Content="BİLGİLERİ GÜNCELLE" 
+            <Button Content="BİLGİLERİ GÜNCELLE"  Margin="0,30,0,2"
                     Style="{StaticResource MaterialDesignRaisedButton}" 
                     Background="#BB2248" BorderBrush="#BB2248" Height="45" 
                     FontWeight="Bold" Command="{Binding UpdateCommand}"/>
+            
             <Button Content="İptal" Style="{StaticResource MaterialDesignFlatButton}" 
                     Foreground="Gray" Margin="0,10,0,0" Command="{Binding CancelCommand}"/>
         </StackPanel>

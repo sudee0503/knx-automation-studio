@@ -64,15 +64,16 @@
                     <TextBox Text="{Binding VideoDisplay}" IsReadOnly="True" 
                              materialDesign:HintAssist.Hint="Mevcut Video Dosyası" 
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
-
-                    <Button Grid.Column="1" Content="..." Command="{Binding SelectVideoCommand}" 
-                            Margin="10,0,0,0" Style="{StaticResource MaterialDesignFlatDarkBgButton}" 
-                            Background="#BB2248" BorderBrush="#BB2248" ToolTip="Videoyu Değiştir"/>
-
-                    <Button Grid.Column="2" Command="{Binding DeleteVideoCommand}" 
+                    
+                    <Button Grid.Column="1" Command="{Binding DeleteVideoCommand}" 
                             Margin="5,0,0,0" Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}" 
                             Background="#D32F2F" BorderThickness="0" Width="30" Height="30" ToolTip="Videonun Kaydını Tamamen Sil">
                         <materialDesign:PackIcon Kind="Delete" Foreground="White" Width="18" Height="18"/>
+                    </Button>
+
+                    <Button Grid.Column="2" Content="..." Command="{Binding SelectVideoCommand}" 
+                            Margin="10,0,0,0" Style="{StaticResource MaterialDesignFlatDarkBgButton}" 
+                            Background="#BB2248" BorderBrush="#BB2248" ToolTip="Videoyu Değiştir">
                     </Button>
                 </Grid>
             </StackPanel>

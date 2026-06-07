@@ -50,12 +50,12 @@
                         <TextBlock Text="Veritabanı Bakımı" FontSize="18" FontWeight="Bold" Foreground="#BB2248" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="Sistemin hızlı çalışması için 1 yıldan eski işlem kayıtlarını (Log) Excel formatında dışa aktarıp, veritabanından kalıcı olarak temizleyebilirsiniz." FontSize="13" Foreground="Gray" Margin="0,0,0,30" TextWrapping="Wrap" LineHeight="20"/>
+                    <TextBlock Text="İşlem kayıtlarını Excel formatında dışa aktarıp, veritabanından kalıcı olarak temizleyebilirsiniz." FontSize="13" Foreground="Gray" Margin="0,0,0,30" TextWrapping="Wrap" LineHeight="20"/>
 
                     <Border Background="#FFF3CD" BorderBrush="#FFEEBA" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,40">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="InformationOutline" Foreground="#856404" Width="24" Height="24" VerticalAlignment="Center"/>
-                            <TextBlock Text="Bu işlem önce verileri Excel olarak masaüstünüze kaydeder, işlem sorunsuz biterse veritabanından siler." Foreground="#856404" FontSize="12" Margin="10,0,0,0" TextWrapping="Wrap" Width="310"/>
+                            <TextBlock Text="Bu işlem önce verileri Excel olarak kaydeder, işlem sorunsuz biterse veritabanından siler." Foreground="#856404" FontSize="12" Margin="10,0,0,0" TextWrapping="Wrap" Width="310"/>
                         </StackPanel>
                     </Border>
 

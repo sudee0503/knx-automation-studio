@@ -14,9 +14,14 @@ namespace Sude.ViewModels.AdminViewModels.DialogWindowViewModels
 {
     public partial class TestStepItem : ObservableObject
     {
-        [ObservableProperty] private int _stepOrder;
-        [ObservableProperty] private string _instructionText;
-        [ObservableProperty] private string _imagePath;
+        [ObservableProperty] 
+        private int _stepOrder;
+
+        [ObservableProperty] 
+        private string _instructionText;
+
+        [ObservableProperty] 
+        private string _imagePath;
 
         private readonly Action<TestStepItem> _removeCallback;
 
@@ -165,29 +170,20 @@ namespace Sude.ViewModels.AdminViewModels.DialogWindowViewModels
                     MainImageFileData = _fileService.GetFileBytes(MainImagePath)
                 };
 
+                // Eski iki IF bloğu yerine tek satırlık ekleme yapıyoruz
                 var assets = new List<DeviceAsset>();
 
                 foreach (var step in TestSteps)
                 {
-                    if (!string.IsNullOrWhiteSpace(step.InstructionText))
+                    assets.Add(new DeviceAsset
                     {
-                        assets.Add(new DeviceAsset
-                        {
-                            StepOrder = step.StepOrder,
-                            ContentType = "InstructionText",
-                            ContentText = step.InstructionText
-                        });
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(step.ImagePath))
-                    {
-                        assets.Add(new DeviceAsset
-                        {
-                            StepOrder = step.StepOrder,
-                            ContentType = "ButtonImage",
-                            ContentData = _fileService.GetFileBytes(step.ImagePath)
-                        });
-                    }
+                        StepOrder = step.StepOrder,
+                        ContentType = "StepData",
+                        ContentText = step.InstructionText,
+                        ContentData = !string.IsNullOrWhiteSpace(step.ImagePath)
+                            ? _fileService.GetFileBytes(step.ImagePath)
+                            : Array.Empty<byte>() // Null yerine boş dizi döndürülüyor
+                    });
                 }
 
                 int newDeviceId = await _databaseService.AddDeviceWithAssetsAsync(device, assets);

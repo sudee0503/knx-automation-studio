@@ -110,21 +110,23 @@ namespace Sude.ViewModels.AdminViewModels.DialogWindowViewModels
         private async Task LoadExistingAssetsAsync()
         {
             var assets = await _databaseService.GetDeviceAssetsAsync(DeviceId);
-
             var groupedAssets = assets.GroupBy(a => a.StepOrder).OrderBy(g => g.Key);
 
             foreach (var group in groupedAssets)
             {
                 var step = new EditStepItem(group.Key, RemoveStep);
 
-                var textAsset = group.FirstOrDefault(a => a.ContentType == "InstructionText");
-                if (textAsset != null) step.InstructionText = textAsset.ContentText;
+                // Yeni sistem ("StepData" adıyla tek satır)
+                var combinedAsset = group.FirstOrDefault(a => a.ContentType == "StepData");
 
-                var imageAsset = group.FirstOrDefault(a => a.ContentType == "ButtonImage");
-                if (imageAsset != null)
+                if (combinedAsset != null)
                 {
-                    step.ExistingImageBytes = imageAsset.ContentData;
-                    step.DisplayImage = ByteArrayToImage(imageAsset.ContentData);
+                    step.InstructionText = combinedAsset.ContentText;
+                    if (combinedAsset.ContentData != null)
+                    {
+                        step.ExistingImageBytes = combinedAsset.ContentData;
+                        step.DisplayImage = ByteArrayToImage(combinedAsset.ContentData);
+                    }
                 }
                 TestSteps.Add(step);
             }
@@ -230,38 +232,20 @@ namespace Sude.ViewModels.AdminViewModels.DialogWindowViewModels
                 {
                     EditingDevice.MainImageFileData = _fileService.GetFileBytes(_newMainImagePath);
                 }
+
                 var newAssets = new List<DeviceAsset>();
 
                 foreach (var step in TestSteps)
                 {
-                    if (!string.IsNullOrWhiteSpace(step.InstructionText))
+                    newAssets.Add(new DeviceAsset
                     {
-                        newAssets.Add(new DeviceAsset
-                        {
-                            StepOrder = step.StepOrder,
-                            ContentType = "InstructionText",
-                            ContentText = step.InstructionText
-                        });
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(step.ImagePath))
-                    {
-                        newAssets.Add(new DeviceAsset
-                        {
-                            StepOrder = step.StepOrder,
-                            ContentType = "ButtonImage",
-                            ContentData = _fileService.GetFileBytes(step.ImagePath)
-                        });
-                    }
-                    else if (step is EditStepItem editStep && editStep.ExistingImageBytes != null)
-                    {
-                        newAssets.Add(new DeviceAsset
-                        {
-                            StepOrder = step.StepOrder,
-                            ContentType = "ButtonImage",
-                            ContentData = editStep.ExistingImageBytes
-                        });
-                    }
+                        StepOrder = step.StepOrder,
+                        ContentType = "StepData", // Yeni birleşik türümüz
+                        ContentText = step.InstructionText,
+                        ContentData = !string.IsNullOrWhiteSpace(step.ImagePath)
+                            ? _fileService.GetFileBytes(step.ImagePath)
+                            : Array.Empty<byte>()
+                    });
                 }
 
                 await _databaseService.UpdateDeviceAsync(EditingDevice, newAssets);

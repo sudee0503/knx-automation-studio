@@ -1,4 +1,6 @@
-﻿namespace Sude.Models
+﻿using System;
+
+namespace Sude.Models
 {
     public class Log
     {
@@ -15,28 +17,39 @@
 
         public int? HedefUserId { get; set; }
         public int? HedefDeviceId { get; set; }
-
         public string HedefSeriNo { get; set; }
+        public string HedefKullaniciAdi { get; set; }
 
         public string IslemAciklamasi
         {
             get
             {
-                string metin = !string.IsNullOrEmpty(IslemAdi) ? IslemAdi : "İşlem Bilinmiyor";
+                string islem = !string.IsNullOrEmpty(IslemAdi) ? IslemAdi : "İşlem Bilinmiyor";
+
+                if (islem == "Sisteme Giriş" || islem == "Sistemden Çıkış")
+                {
+                    return $"{KullaniciAdi} {islem} Yaptı";
+                }
+
+                string metin = "";
 
                 if (!string.IsNullOrEmpty(HedefSeriNo))
                 {
-                    metin += $" (Seri No: {HedefSeriNo})";
+                    metin = $" {HedefSeriNo} Numaralı ";
                 }
                 else if (HedefDeviceId.HasValue && HedefDeviceId.Value > 0)
                 {
-                    metin += $" (Cihaz ID: {HedefDeviceId.Value})";
+                    metin = $" {HedefDeviceId.Value} Model Kodlu ";
+                }
+                else if (!string.IsNullOrEmpty(HedefKullaniciAdi))
+                {
+                    metin = $" {HedefKullaniciAdi} İsimli ";
                 }
                 else if (HedefUserId.HasValue && HedefUserId.Value > 0)
                 {
-                    metin += $" (Kullanıcı ID: {HedefUserId.Value})";
+                    metin = $" {HedefUserId.Value} Numaralı'li ";
                 }
-                return metin;
+                return metin + islem;
             }
         }
     }

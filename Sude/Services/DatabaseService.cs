@@ -7,12 +7,12 @@ using Sude.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace Sude.Services
 {
     public class DatabaseService
     {
-
         // ==========================================
         //           DASHBOARD METOTLARI
         // ==========================================
@@ -111,12 +111,15 @@ namespace Sude.Services
         {
             using var conn = SqlConnectionHelper.GetConnection();
 
+            // YENİ: tu.Username AS HedefKullaniciAdi ve LEFT JOIN eklendi
             string query = $@"SELECT TOP {count} l.Id, l.Tarihi, u.Username AS KullaniciAdi, t.TType AS IslemAdi, 
-                             l.HedefUserId, l.HedefDeviceId, l.HedefSeriNo
-                      FROM Logs l
-                      INNER JOIN Users u ON l.UserId = u.Id
-                      INNER JOIN TransactionTypes t ON l.TTypeId = t.Id
-                      ORDER BY l.Tarihi DESC";
+                                     l.HedefUserId, l.HedefDeviceId, l.HedefSeriNo,
+                                     tu.Username AS HedefKullaniciAdi
+                              FROM Logs l
+                              INNER JOIN Users u ON l.UserId = u.Id
+                              INNER JOIN TransactionTypes t ON l.TTypeId = t.Id
+                              LEFT JOIN Users tu ON l.HedefUserId = tu.Id
+                              ORDER BY l.Tarihi DESC";
 
             var result = await conn.QueryAsync<Log>(query);
             return result.ToList();
@@ -137,8 +140,8 @@ namespace Sude.Services
         {
             using var conn = SqlConnectionHelper.GetConnection();
             string query = @"INSERT INTO Users (Username, PasswordHash, Role, IsActive, CreatedAt) 
-                     VALUES (@Username, @Password, @Role, 1, GETDATE());
-                     SELECT CAST(SCOPE_IDENTITY() as int);";
+                             VALUES (@Username, @Password, @Role, 1, GETDATE());
+                             SELECT CAST(SCOPE_IDENTITY() as int);";
 
             return await conn.ExecuteScalarAsync<int>(query, user);
         }
@@ -171,19 +174,17 @@ namespace Sude.Services
         {
             using var conn = SqlConnectionHelper.GetConnection();
 
+            // YENİ: tu.Username AS HedefKullaniciAdi ve LEFT JOIN eklendi
             string query = @"
-        SELECT 
-            l.Id, 
-            l.Tarihi, 
-            l.HedefUserId, 
-            l.HedefDeviceId, 
-            l.HedefSeriNo, 
-            u.Username AS KullaniciAdi, 
-            tt.TType AS IslemAdi 
-        FROM Logs l
-        LEFT JOIN Users u ON l.UserId = u.Id
-        LEFT JOIN TransactionTypes tt ON l.TTypeId = tt.Id 
-        WHERE 1=1";
+                SELECT 
+                    l.Id, l.Tarihi, l.HedefUserId, l.HedefDeviceId, l.HedefSeriNo, 
+                    u.Username AS KullaniciAdi, tt.TType AS IslemAdi,
+                    tu.Username AS HedefKullaniciAdi
+                FROM Logs l
+                LEFT JOIN Users u ON l.UserId = u.Id
+                LEFT JOIN TransactionTypes tt ON l.TTypeId = tt.Id 
+                LEFT JOIN Users tu ON l.HedefUserId = tu.Id
+                WHERE 1=1";
 
             if (filter != null)
             {
@@ -209,14 +210,14 @@ namespace Sude.Services
         {
             using var conn = SqlConnectionHelper.GetConnection();
             string query = @"INSERT INTO Logs (UserId, HedefUserId, HedefDeviceId, HedefSeriNo, Tarihi, TTypeId) 
-                     VALUES (@UserId, @HedefUserId, @HedefDeviceId, @HedefSeriNo, GETDATE(), @TTypeId)";
+                             VALUES (@UserId, @HedefUserId, @HedefDeviceId, @HedefSeriNo, GETDATE(), @TTypeId)";
 
             await conn.ExecuteAsync(query, new
             {
                 UserId = performerId,
                 HedefUserId = targetUserId,
                 HedefDeviceId = targetDeviceId,
-                HedefSeriNo = hedefSeriNo, 
+                HedefSeriNo = hedefSeriNo,
                 TTypeId = (int)tur
             });
         }
@@ -333,12 +334,16 @@ namespace Sude.Services
         public async Task<List<Log>> GetLogsOlderThanAsync(DateTime date)
         {
             using var conn = SqlConnectionHelper.GetConnection();
+
+            // YENİ: tu.Username AS HedefKullaniciAdi ve LEFT JOIN eklendi
             string query = @"
                 SELECT l.Id, l.Tarihi, u.Username AS KullaniciAdi, tt.TType AS IslemAdi, 
-                       l.HedefUserId, l.HedefDeviceId, l.HedefSeriNo
+                       l.HedefUserId, l.HedefDeviceId, l.HedefSeriNo,
+                       tu.Username AS HedefKullaniciAdi
                 FROM Logs l
                 LEFT JOIN Users u ON l.UserId = u.Id
                 LEFT JOIN TransactionTypes tt ON l.TTypeId = tt.Id
+                LEFT JOIN Users tu ON l.HedefUserId = tu.Id
                 WHERE l.Tarihi < @Date
                 ORDER BY l.Tarihi ASC";
 
@@ -361,8 +366,8 @@ namespace Sude.Services
             using var conn = SqlConnectionHelper.GetConnection();
 
             string query = @"SELECT Id, Username, PasswordHash AS Password, Role, CreatedAt 
-                     FROM Users 
-                     WHERE Username = @Username AND PasswordHash = @Password AND IsActive = 1";
+                             FROM Users 
+                             WHERE Username = @Username AND PasswordHash = @Password AND IsActive = 1";
 
             var user = await conn.QueryFirstOrDefaultAsync<User>(query, new { Username = username, Password = password });
             return user;
@@ -382,7 +387,7 @@ namespace Sude.Services
             conn.Open();
             var result = cmd.ExecuteScalar();
 
-            if (result != null) return (byte[])result;
+            if (result != null && result != DBNull.Value) return (byte[])result;
 
             byte[] serial = new byte[6];
             serial[0] = 0x02;

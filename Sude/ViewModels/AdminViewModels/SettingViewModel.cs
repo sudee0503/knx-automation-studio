@@ -14,15 +14,19 @@ namespace Sude.ViewModels.AdminViewModels
     {
         private readonly DatabaseService _dbService;
 
-        [ObservableProperty] private string _newUsername;
-        [ObservableProperty] private string _newPassword;
-        [ObservableProperty] private string _confirmPassword;
+        [ObservableProperty] 
+        private string _newUsername;
+        
+        [ObservableProperty] 
+        private string _newPassword;
+        
+        [ObservableProperty] 
+        private string _confirmPassword;
 
         public SettingViewModel()
         {
             _dbService = new DatabaseService();
         }
-
         [RelayCommand]
         private async Task UpdateAdminInfo()
         {
@@ -59,34 +63,40 @@ namespace Sude.ViewModels.AdminViewModels
         [RelayCommand]
         private async Task ArchiveAndCleanLogs()
         {
-            bool confirm = CustomMessageBoxWindow.Show("1 yıldan eski tüm işlem kayıtları Excel dosyasına aktarılacak ve veritabanından KALICI OLARAK SİLİNECEKTİR.\n\nİşlemi onaylıyor musunuz?", "Arşivleme Onayı", CustomMessageBoxType.Warning, CustomMessageBoxButtons.YesNo);
+            bool confirm = CustomMessageBoxWindow.Show(
+                "DİKKAT: Veritabanındaki TÜM işlem kayıtları Excel dosyasına aktarılacak ve veritabanından KALICI OLARAK SİLİNECEKTİR.\n\nBu işlemi onaylıyor musunuz?",
+                "Veritabanı Bakım ve Sıfırlama",
+                CustomMessageBoxType.Warning,
+                CustomMessageBoxButtons.YesNo);
 
             if (!confirm) return;
 
-            DateTime thresholdDate = DateTime.Now.AddYears(-1);
+            DateTime thresholdDate = DateTime.Now.AddDays(1);
 
             try
             {
-                var oldLogs = await _dbService.GetLogsOlderThanAsync(thresholdDate);
+                var allLogs = await _dbService.GetLogsOlderThanAsync(thresholdDate);
 
-                if (oldLogs == null || oldLogs.Count == 0)
+                if (allLogs == null || allLogs.Count == 0)
                 {
-                    CustomMessageBoxWindow.Show("Veritabanında 1 yıldan eski, arşivlenecek kayıt bulunmuyor.", "Bilgi", CustomMessageBoxType.Info);
+                    CustomMessageBoxWindow.Show("Arşivlenecek kayıt bulunmuyor.", "Bilgi", CustomMessageBoxType.Info);
                     return;
                 }
 
                 var sfd = new SaveFileDialog
                 {
                     Filter = "Excel Dosyası|*.xlsx",
-                    Title = "Eski Logları Arşivle",
-                    FileName = $"KNX_Log_Arsivi_{thresholdDate:yyyy}_ve_oncesi.xlsx"
+                    Title = "Tüm Logları Arşivle ve Sıfırla",
+                    FileName = $"KNX_Log_Arsivi_{DateTime.Now:yyyyMMdd_HHmm}.xlsx",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
                 };
 
                 if (sfd.ShowDialog() == true)
                 {
+                    // 1. Excel dosyasını oluştur
                     using (var workbook = new XLWorkbook())
                     {
-                        var worksheet = workbook.Worksheets.Add("Eski Kayıtlar");
+                        var worksheet = workbook.Worksheets.Add("Tüm İşlem Kayıtları");
 
                         worksheet.Cell(1, 1).Value = "İşlemi Yapan";
                         worksheet.Cell(1, 2).Value = "İşlem Detayı";
@@ -94,24 +104,27 @@ namespace Sude.ViewModels.AdminViewModels
                         worksheet.Range("A1:C1").Style.Font.Bold = true;
                         worksheet.Range("A1:C1").Style.Fill.BackgroundColor = XLColor.LightGray;
 
-                        for (int i = 0; i < oldLogs.Count; i++)
+                        for (int i = 0; i < allLogs.Count; i++)
                         {
-                            var log = oldLogs[i];
+                            var log = allLogs[i];
                             worksheet.Cell(i + 2, 1).Value = log.KullaniciAdi;
                             worksheet.Cell(i + 2, 2).Value = log.IslemAciklamasi;
                             worksheet.Cell(i + 2, 3).Value = log.Tarihi.ToString("dd.MM.yyyy HH:mm:ss");
                         }
+
                         worksheet.Columns().AdjustToContents();
-                        workbook.SaveAs(sfd.FileName);
+                        workbook.SaveAs(sfd.FileName); // Dosyayı kaydet
                     }
+
+                    // 2. Eğer dosya kaydı başarılı olduysa veritabanını temizle
                     await _dbService.DeleteLogsOlderThanAsync(thresholdDate);
 
-                    CustomMessageBoxWindow.Show($"{oldLogs.Count} adet eski kayıt başarıyla Excel'e arşivlendi ve veritabanı temizlendi!", "Arşivleme Başarılı", CustomMessageBoxType.Success);
+                    CustomMessageBoxWindow.Show($"{allLogs.Count} adet kayıt başarıyla arşivlendi ve veritabanı temizlendi!", "Başarılı", CustomMessageBoxType.Success);
                 }
             }
             catch (Exception ex)
             {
-                CustomMessageBoxWindow.Show($"Arşivleme sırasında hata oluştu. Veriler SİLİNMEDİ!\nHata: {ex.Message}", "Hata", CustomMessageBoxType.Error);
+                CustomMessageBoxWindow.Show($"İşlem sırasında hata: {ex.Message}\n\nVeriler silinmedi, Excel dosyası açık olabilir.", "Hata", CustomMessageBoxType.Error);
             }
         }
     }

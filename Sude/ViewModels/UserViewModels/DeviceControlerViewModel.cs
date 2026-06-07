@@ -198,30 +198,17 @@ namespace Sude.ViewModels.UserViewModels
             }
             else
             {
-                int testStep = step - 1; 
-
+                int testStep = step - 1;
                 var stepAssets = _deviceAssets.Where(a => a.StepOrder == testStep).ToList();
 
                 if (stepAssets.Any())
                 {
-                    var textAsset = stepAssets.FirstOrDefault(a => a.ContentType == "InstructionText");
-                    if (textAsset != null && !string.IsNullOrWhiteSpace(textAsset.ContentText))
-                    {
-                        InstructionText = textAsset.ContentText;
-                    }
-                    else
-                    {
-                        InstructionText = $"Lütfen cihazı tetikleyin ({testStep}. Adım)";
-                    }
+                    var combinedAsset = stepAssets.FirstOrDefault(a => a.ContentType == "StepData");
 
-                    var imageAsset = stepAssets.FirstOrDefault(a => a.ContentType == "ButtonImage");
-                    if (imageAsset != null && imageAsset.ContentData != null)
+                    if (combinedAsset != null)
                     {
-                        DisplayImage = ByteArrayToImage(imageAsset.ContentData);
-                    }
-                    else
-                    {
-                        DisplayImage = ByteArrayToImage(CurrentDevice.MainImageFileData);
+                        InstructionText = !string.IsNullOrWhiteSpace(combinedAsset.ContentText) ? combinedAsset.ContentText : $"Lütfen cihazı tetikleyin ({testStep}. Adım)";
+                        DisplayImage = combinedAsset.ContentData != null ? ByteArrayToImage(combinedAsset.ContentData) : ByteArrayToImage(CurrentDevice.MainImageFileData);
                     }
                 }
                 else
